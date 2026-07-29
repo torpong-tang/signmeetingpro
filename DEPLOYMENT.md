@@ -8,7 +8,7 @@ This runbook deploys SignMeetingPro behind Nginx at `/signmeetingpro` without ch
 Source:  /var/www/apps/signmeetingpro
 SQLite:  /var/lib/2startup/signmeetingpro/signmeetingpro.db
 Storage: /var/lib/2startup/signmeetingpro/storage
-Port:    3011 (127.0.0.1 only)
+Port:    3012 (127.0.0.1 only)
 URL:     https://2startup.cloud/signmeetingpro
 ```
 
@@ -52,11 +52,12 @@ npm ci
 npm run db:generate
 DATABASE_URL=file:/var/lib/2startup/signmeetingpro/signmeetingpro.db npx prisma db push
 npm run build
-pm2 start npm --name signmeetingpro -- start
+pm2 start npm --name signmeetingpro -- run start:production
 pm2 save
 ```
 
-The PM2 environment must set `HOSTNAME=127.0.0.1`, `PORT=3011`, and the variables above.
+The `start:production` script binds SignMeetingPro to `127.0.0.1:3012`.
+Port `3011` remains reserved for AppFund.
 
 ## Safe update
 
@@ -81,8 +82,8 @@ Do not run `pm2 restart all`. Check this application and all shared routes:
 
 ```bash
 pm2 status
-ss -ltnp | grep 3011
-curl -fsS http://127.0.0.1:3011/signmeetingpro/api/health
+ss -ltnp | grep 3012
+curl -fsS http://127.0.0.1:3012/signmeetingpro/api/health
 curl -fsS https://2startup.cloud/signmeetingpro/api/health
 curl -sS -o /dev/null -w '%{http_code}\n' https://2startup.cloud/signmeetingpro/meetings
 nginx -t
