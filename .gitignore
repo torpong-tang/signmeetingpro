@@ -12,6 +12,9 @@
 
 # testing
 /coverage
+/playwright-report/
+/test-results/
+/.playwright-cli/
 
 # next.js
 /.next/
@@ -23,6 +26,8 @@
 # misc
 .DS_Store
 *.pem
+*:Zone.Identifier
+; await page.setContent*
 
 # debug
 npm-debug.log*
@@ -32,6 +37,13 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+!.env.example
+
+# runtime data
+/storage/
+/prisma/*.db
+/prisma/*.db-journal
+/prisma/*.db*.bak
 
 # vercel
 .vercel

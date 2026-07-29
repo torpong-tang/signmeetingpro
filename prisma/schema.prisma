@@ -1,0 +1,241 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  ADMIN
+  MEETING_MANAGER
+}
+
+enum MeetingStatus {
+  DRAFT
+  OPEN
+  CLOSED
+  CANCELLED
+  ARCHIVED
+}
+
+enum QrMode {
+  GROUP
+  OPEN
+}
+
+enum MediaKind {
+  PICTURE
+  DOCUMENT
+  QR_IMAGE
+}
+
+enum AuditAction {
+  CREATE
+  UPDATE
+  DELETE
+  LOGIN
+  LOGOUT
+  REGISTER
+  EXPORT
+}
+
+model User {
+  id                String             @id @default(cuid())
+  email             String             @unique
+  passwordHash      String
+  firstName         String
+  lastName          String
+  phone             String?
+  avatarPath        String?
+  role              UserRole           @default(MEETING_MANAGER)
+  active            Boolean            @default(true)
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  sessions          Session[]
+  projects          ProjectMember[]
+  meetings          Meeting[]          @relation("MeetingOrganizer")
+  participantGroups ParticipantGroup[]
+  auditLogs         AuditLog[]
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  tokenHash String   @unique
+  userId    String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model Project {
+  id             String          @id @default(cuid())
+  code           String          @unique
+  name           String
+  contractNumber String?
+  contractStart  DateTime?
+  contractEnd    DateTime?
+  active         Boolean         @default(true)
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  members        ProjectMember[]
+  meetings       Meeting[]
+}
+
+model ProjectMember {
+  id        String   @id @default(cuid())
+  projectId String
+  userId    String
+  createdAt DateTime @default(now())
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, userId])
+  @@index([userId])
+}
+
+model ParticipantGroup {
+  id           String             @id @default(cuid())
+  name         String
+  description  String?
+  active       Boolean            @default(true)
+  createdById  String
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+  createdBy    User               @relation(fields: [createdById], references: [id])
+  participants Participant[]
+  channels     MeetingQrChannel[]
+
+  @@index([name])
+}
+
+model Participant {
+  id          String           @id @default(cuid())
+  groupId     String
+  firstName   String
+  lastName    String
+  position    String
+  department  String?
+  phone       String?
+  email       String?
+  active      Boolean          @default(true)
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  group       ParticipantGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  attendances Attendance[]
+
+  @@index([groupId, lastName, firstName])
+}
+
+model Meeting {
+  id                    String             @id @default(cuid())
+  meetingCode           String             @unique
+  projectId             String
+  organizerId           String
+  title                 String
+  agenda                String?
+  meetingDate           DateTime
+  startTime             String
+  endTime               String
+  location              String
+  registerLimitMinutes  Int                @default(20)
+  allowLateRegistration Boolean            @default(false)
+  status                MeetingStatus      @default(DRAFT)
+  createdAt             DateTime           @default(now())
+  updatedAt             DateTime           @updatedAt
+  project               Project            @relation(fields: [projectId], references: [id])
+  organizer             User               @relation("MeetingOrganizer", fields: [organizerId], references: [id])
+  channels              MeetingQrChannel[]
+  attendances           Attendance[]
+  media                 MeetingMedia[]
+
+  @@index([projectId, meetingDate])
+  @@index([organizerId])
+}
+
+model MeetingQrChannel {
+  id          String            @id @default(cuid())
+  meetingId   String
+  channelNo   Int
+  mode        QrMode            @default(GROUP)
+  groupId     String?
+  aliasName   String
+  imagePath   String?
+  token       String            @unique
+  active      Boolean           @default(true)
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  meeting     Meeting           @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  group       ParticipantGroup? @relation(fields: [groupId], references: [id])
+  attendances Attendance[]
+
+  @@unique([meetingId, channelNo])
+}
+
+model Attendance {
+  id                 String           @id @default(cuid())
+  meetingId          String
+  channelId          String
+  participantId      String?
+  personNo           Int
+  displayOrder       Int              @default(0)
+  firstNameSnapshot  String
+  lastNameSnapshot   String
+  positionSnapshot   String
+  departmentSnapshot String?
+  phoneSnapshot      String?
+  emailSnapshot      String?
+  signaturePath      String?
+  registeredAt       DateTime         @default(now())
+  meeting            Meeting          @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  channel            MeetingQrChannel @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  participant        Participant?     @relation(fields: [participantId], references: [id])
+
+  @@unique([meetingId, personNo])
+  @@index([meetingId, channelId, displayOrder])
+  @@index([meetingId, registeredAt])
+}
+
+model MeetingMedia {
+  id           String    @id @default(cuid())
+  meetingId    String
+  kind         MediaKind
+  originalName String
+  storedName   String
+  mimeType     String
+  sizeBytes    Int
+  path         String
+  checksum     String
+  createdAt    DateTime  @default(now())
+  meeting      Meeting   @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+
+  @@index([meetingId, kind])
+}
+
+model AuditLog {
+  id        String      @id @default(cuid())
+  userId    String?
+  action    AuditAction
+  entity    String
+  entityId  String?
+  summary   String
+  oldValues String?
+  newValues String?
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime    @default(now())
+  user      User?       @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([entity, entityId])
+  @@index([createdAt])
+}
+
+model AppSetting {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt
+}

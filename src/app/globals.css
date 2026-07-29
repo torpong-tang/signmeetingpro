@@ -1,26 +1,290 @@
 @import "tailwindcss";
+@import "tw-animate-css";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@custom-variant dark (&:is(.dark *));
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-prompt);
+  --font-heading: var(--font-prompt);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 8px;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+:root,
+.dark {
+  --background: #050d1d;
+  --foreground: #f8fafc;
+  --card: #101d33;
+  --card-foreground: #f8fafc;
+  --popover: #0d1a30;
+  --popover-foreground: #f8fafc;
+  --primary: #ff9f1c;
+  --primary-foreground: #07101f;
+  --secondary: #14345b;
+  --secondary-foreground: #e7f4ff;
+  --muted: #14233a;
+  --muted-foreground: #9fb1ca;
+  --accent: #124a75;
+  --accent-foreground: #f8fafc;
+  --destructive: #ff4d6d;
+  --border: rgba(124, 168, 215, 0.24);
+  --input: rgba(17, 36, 64, 0.9);
+  --ring: #ffb703;
+  --chart-1: #ff9f1c;
+  --chart-2: #22d3ee;
+  --chart-3: #34d399;
+  --chart-4: #a78bfa;
+  --chart-5: #fb7185;
+  --sidebar: #071426;
+  --sidebar-foreground: #f8fafc;
+  --sidebar-primary: #ff9f1c;
+  --sidebar-primary-foreground: #07101f;
+  --sidebar-accent: #123052;
+  --sidebar-accent-foreground: #f8fafc;
+  --sidebar-border: rgba(124, 168, 215, 0.22);
+  --sidebar-ring: #ffb703;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+    letter-spacing: 0;
+  }
+  html {
+    min-height: 100%;
+    font-family: var(--font-prompt), sans-serif;
+    background: #050d1d;
+  }
+  body {
+    min-height: 100vh;
+    color: var(--foreground);
+    background:
+      radial-gradient(circle at 12% 0%, rgba(24, 107, 170, 0.22), transparent 34rem),
+      radial-gradient(circle at 92% 12%, rgba(255, 159, 28, 0.12), transparent 30rem),
+      linear-gradient(145deg, #050d1d 0%, #071426 48%, #030916 100%);
+  }
+  button, input, select, textarea {
+    font: inherit;
+  }
+  button:not(:disabled),
+  a[href],
+  [role="button"]:not([aria-disabled="true"]),
+  summary,
+  select,
+  input[type="checkbox"],
+  input[type="radio"],
+  input[type="file"],
+  label[for] {
+    cursor: pointer;
+  }
+  button:disabled,
+  [role="button"][aria-disabled="true"] {
+    cursor: not-allowed;
+  }
+  button:not(:disabled),
+  a[href],
+  [role="button"]:not([aria-disabled="true"]) {
+    transition:
+      color 160ms ease,
+      background-color 160ms ease,
+      border-color 160ms ease,
+      box-shadow 160ms ease,
+      filter 160ms ease,
+      transform 160ms ease;
+  }
+  button:not(:disabled):hover,
+  a[href]:hover,
+  [role="button"]:not([aria-disabled="true"]):hover {
+    filter:
+      brightness(1.06)
+      drop-shadow(0 0 5px var(--button-glow, rgba(255, 183, 3, 0.5)))
+      drop-shadow(0 0 14px var(--button-glow, rgba(34, 211, 238, 0.3)));
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer components {
+  .glass-panel {
+    background: linear-gradient(145deg, rgba(18, 37, 65, 0.86), rgba(9, 23, 43, 0.78));
+    border: 1px solid rgba(112, 167, 220, 0.25);
+    box-shadow: 0 18px 55px rgba(0, 0, 0, 0.24);
+    backdrop-filter: blur(18px);
+  }
+  .glass-card {
+    background: linear-gradient(145deg, rgba(18, 42, 72, 0.82), rgba(10, 26, 49, 0.7));
+    border: 1px solid rgba(92, 157, 219, 0.28);
+    box-shadow: inset 0 1px rgba(255, 255, 255, 0.04), 0 12px 30px rgba(1, 8, 20, 0.22);
+  }
+  .glow-orange {
+    box-shadow: 0 0 0 1px rgba(255, 159, 28, 0.45), 0 0 24px rgba(255, 159, 28, 0.15);
+  }
+  .action-save {
+    --button-glow: rgba(52, 211, 153, 0.52);
+    background-color: #10b981 !important;
+    color: #020617 !important;
+  }
+  .action-add {
+    --button-glow: rgba(34, 211, 238, 0.52);
+    background-color: #22d3ee !important;
+    color: #020617 !important;
+  }
+  .action-edit {
+    --button-glow: rgba(251, 191, 36, 0.55);
+    background-color: #fbbf24 !important;
+    color: #020617 !important;
+  }
+  .action-delete {
+    --button-glow: rgba(244, 63, 94, 0.55);
+    background-color: #f43f5e !important;
+    color: #ffffff !important;
+  }
+  .action-neutral {
+    --button-glow: rgba(148, 163, 184, 0.42);
+    background-color: #475569 !important;
+    color: #ffffff !important;
+  }
+  .action-refresh {
+    --button-glow: rgba(59, 130, 246, 0.55);
+    background-color: #3b82f6 !important;
+    color: #ffffff !important;
+  }
+  .action-view {
+    --button-glow: rgba(167, 139, 250, 0.58);
+    background-color: #8b5cf6 !important;
+    color: #ffffff !important;
+  }
+  .action-calendar {
+    --button-glow: rgba(56, 189, 248, 0.55);
+    background-color: #0ea5e9 !important;
+    color: #020617 !important;
+  }
+  .action-qr {
+    --button-glow: rgba(34, 211, 238, 0.55);
+    background-color: #06b6d4 !important;
+    color: #020617 !important;
+  }
+  .action-attendance {
+    --button-glow: rgba(16, 185, 129, 0.55);
+    background-color: #10b981 !important;
+    color: #020617 !important;
+  }
+  .action-image {
+    --button-glow: rgba(217, 70, 239, 0.55);
+    background-color: #d946ef !important;
+    color: #ffffff !important;
+  }
+  .action-document {
+    --button-glow: rgba(14, 165, 233, 0.55);
+    background-color: #0284c7 !important;
+    color: #ffffff !important;
+  }
+  .action-copy {
+    --button-glow: rgba(99, 102, 241, 0.58);
+    background-color: #6366f1 !important;
+    color: #ffffff !important;
+  }
+  .action-tour {
+    --button-glow: rgba(168, 85, 247, 0.58);
+    background-color: #a855f7 !important;
+    color: #ffffff !important;
+  }
+  .action-switch {
+    --button-glow: rgba(20, 184, 166, 0.55);
+    background-color: #14b8a6 !important;
+    color: #020617 !important;
+  }
+  .action-save:hover,
+  .action-attendance:hover {
+    background-color: #34d399 !important;
+  }
+  .action-add:hover,
+  .action-qr:hover {
+    background-color: #67e8f9 !important;
+  }
+  .action-edit:hover {
+    background-color: #fcd34d !important;
+  }
+  .action-delete:hover {
+    background-color: #fb7185 !important;
+  }
+  .action-neutral:hover {
+    background-color: #64748b !important;
+  }
+  .action-refresh:hover {
+    background-color: #60a5fa !important;
+  }
+  .action-view:hover {
+    background-color: #a78bfa !important;
+  }
+  .action-calendar:hover,
+  .action-document:hover {
+    background-color: #38bdf8 !important;
+  }
+  .action-image:hover {
+    background-color: #e879f9 !important;
+  }
+  .action-copy:hover {
+    background-color: #818cf8 !important;
+  }
+  .action-tour:hover {
+    background-color: #c084fc !important;
+  }
+  .action-switch:hover {
+    background-color: #2dd4bf !important;
+  }
+  .required-mark {
+    @apply ml-1 text-rose-400;
+  }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.driver-popover.signmeetingpro-tour {
+  border: 1px solid rgba(255, 183, 3, 0.55);
+  background: #102039;
+  color: #f8fafc;
+  font-family: var(--font-prompt), sans-serif;
+}
+.driver-popover.signmeetingpro-tour .driver-popover-title { color: #ffb703; }
+.driver-popover.signmeetingpro-tour button {
+  border: 0;
+  border-radius: 6px;
+  padding: 8px 14px;
+  background: #ff9f1c;
+  color: #07101f;
+  text-shadow: none;
 }
