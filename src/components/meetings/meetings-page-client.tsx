@@ -7,7 +7,6 @@ import { LoadingOverlay } from "@/components/shared/loading-overlay";
 import { Button } from "@/components/ui/button";
 import { MeetingWorkspace } from "@/components/workspaces/meeting-workspace";
 import { useBootstrap } from "@/hooks/use-bootstrap";
-import { appPath } from "@/lib/app-path";
 
 export function MeetingsPageClient() {
   const router = useRouter();
@@ -40,7 +39,7 @@ export function MeetingsPageClient() {
           <Button
             type="button"
             className="action-neutral"
-            onClick={() => router.push(appPath("/"))}
+            onClick={() => router.push("/")}
           >
             <ArrowLeft /> กลับ Dashboard
           </Button>

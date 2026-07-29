@@ -17,7 +17,6 @@ import { MeetingAttendanceDialog } from "@/components/workspaces/meeting-attenda
 import { MeetingMediaDialog } from "@/components/workspaces/meeting-media-dialog";
 import { MeetingQrGallery } from "@/components/workspaces/meeting-qr-gallery";
 import { apiMutation } from "@/hooks/use-bootstrap";
-import { appPath } from "@/lib/app-path";
 import { formatThaiDate } from "@/lib/format";
 import type { MeetingRecord } from "@/types/app";
 
@@ -36,7 +35,7 @@ export function MeetingDetailView({ meeting }: { meeting: MeetingRecord }) {
   const [error, setError] = useState("");
 
   function openEdit() {
-    router.push(appPath(`/meetings?edit=${encodeURIComponent(meeting.id)}`));
+    router.push(`/meetings?edit=${encodeURIComponent(meeting.id)}`);
   }
 
   function goBackToMeetings() {
@@ -44,7 +43,7 @@ export function MeetingDetailView({ meeting }: { meeting: MeetingRecord }) {
       router.back();
       return;
     }
-    router.push(appPath("/meetings"));
+    router.push("/meetings");
   }
 
   function requestDelete() {
@@ -65,7 +64,7 @@ export function MeetingDetailView({ meeting }: { meeting: MeetingRecord }) {
     setError("");
     try {
       await apiMutation(`/api/meetings/${meeting.id}`, "DELETE");
-      router.replace(appPath("/meetings"));
+      router.replace("/meetings");
       router.refresh();
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : "ลบการประชุมไม่สำเร็จ");

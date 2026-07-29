@@ -155,7 +155,7 @@ export function useMeetingWorkspace({
     record: MeetingRecord,
   ) {
     if (action === "detail") {
-      router.push(appPath(`/meetings/${record.id}`));
+      router.push(`/meetings/${record.id}`);
     } else if (action === "attendance") {
       setAttendanceMeeting(record);
     } else if (action === "media") {

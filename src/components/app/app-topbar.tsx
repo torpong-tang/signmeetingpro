@@ -54,7 +54,8 @@ export function AppTopbar({ user }: { user: UserSummary }) {
     setConfirm((value) => ({ ...value, open: false }));
     setLoading(true);
     await fetch(appPath("/api/auth/logout"), { method: "POST" });
-    router.push(appPath("/login"));
+    // Next Router applies next.config.ts basePath automatically.
+    router.push("/login");
     router.refresh();
   }
 

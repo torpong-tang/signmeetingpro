@@ -3,7 +3,6 @@
 import { CalendarRange, FolderKanban, Users, UsersRound } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { appPath } from "@/lib/app-path";
 
 export type WorkspaceKey = "meetings" | "projects" | "managers" | "groups";
 
@@ -19,7 +18,7 @@ export function WorkspaceMenu({ role, onSelect }: { role: "ADMIN" | "MEETING_MAN
 
   function openWorkspace(key: WorkspaceKey) {
     if (key === "meetings") {
-      router.push(appPath("/meetings"));
+      router.push("/meetings");
       return;
     }
     onSelect(key);

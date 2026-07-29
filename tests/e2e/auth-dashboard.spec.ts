@@ -18,6 +18,23 @@ test("admin can login and see the responsive dashboard", async ({ page }) => {
   await expect(page.getByRole("heading", { name: "รายการการประชุม" })).toBeVisible();
 });
 
+test("logout redirects to one login base path", async ({ page }) => {
+  await page.goto("/login");
+  await expect(page.locator("form")).toHaveAttribute("data-hydrated", "true");
+  await page.getByLabel("E-mail *").fill(adminEmail);
+  await page.getByLabel("Password *").fill(adminPassword);
+  await page.getByRole("button", { name: "เข้าสู่ระบบ" }).click();
+  await expect(page.getByRole("heading", { name: "Dashboard" })).toBeVisible();
+
+  await page.locator("#tour-profile").click();
+  await page.getByRole("menuitem", { name: "ออกจากระบบ" }).click();
+  await page.getByRole("button", { name: "ออกจากระบบ" }).click();
+
+  await expect(page).toHaveURL(/\/login$/);
+  await expect(page).not.toHaveURL(/\/signmeetingpro\/signmeetingpro\//);
+  await expect(page.getByRole("heading", { name: "เข้าสู่ระบบ" })).toBeVisible();
+});
+
 test("invalid credentials are rejected without exposing details", async ({ page }) => {
   await page.goto("/login");
   await expect(page.locator("form")).toHaveAttribute("data-hydrated", "true");
