@@ -5,8 +5,9 @@
   "scripts": {
     "dev": "next dev --webpack -H 0.0.0.0 -p 3011",
     "build": "next build",
+    "postbuild": "node scripts/prepare-standalone.mjs",
     "start": "next start -H 127.0.0.1 -p 3011",
-    "start:production": "next start -H 127.0.0.1 -p 3012",
+    "start:production": "HOSTNAME=127.0.0.1 PORT=3012 node .next/standalone/server.js",
     "lint": "eslint",
     "db:generate": "prisma generate",
     "db:push": "prisma db push",

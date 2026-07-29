@@ -59,6 +59,8 @@ pm2 save
 
 The `start:production` script binds SignMeetingPro to `127.0.0.1:3012`.
 Port `3011` remains reserved for AppFund.
+The `postbuild` script copies `.next/static` and `public` into the standalone
+bundle before PM2 starts `.next/standalone/server.js`.
 The checkout's `storage` path must remain a symbolic link to
 `/var/lib/2startup/signmeetingpro/storage` so uploaded files survive releases.
 
