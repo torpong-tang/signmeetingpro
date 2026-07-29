@@ -48,6 +48,7 @@ Verify `.env`, SQLite files, `storage/`, backups and temporary credentials are n
 ```bash
 install -d -m 750 /var/lib/2startup/signmeetingpro/storage
 cd /var/www/apps/signmeetingpro
+ln -sfn /var/lib/2startup/signmeetingpro/storage storage
 npm ci
 npm run db:generate
 DATABASE_URL=file:/var/lib/2startup/signmeetingpro/signmeetingpro.db npx prisma db push
@@ -58,6 +59,8 @@ pm2 save
 
 The `start:production` script binds SignMeetingPro to `127.0.0.1:3012`.
 Port `3011` remains reserved for AppFund.
+The checkout's `storage` path must remain a symbolic link to
+`/var/lib/2startup/signmeetingpro/storage` so uploaded files survive releases.
 
 ## Safe update
 
