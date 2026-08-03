@@ -113,14 +113,14 @@ export function ManagerWorkspace({ open, onOpenChange, projects }: { open: boole
         <div className="overflow-x-auto rounded-lg border border-slate-600/40">
           <table className="min-w-[850px] w-full text-sm">
             <thead className="bg-[#071426] text-left text-slate-300"><tr>
-              <th className="p-3">จัดการ</th>
               <SortableTableHead label="ชื่อ" sortKey="name" activeSortKey={table.sortKey} direction={table.sortDirection} onSort={table.toggleSort} />
               <SortableTableHead label="E-mail" sortKey="email" activeSortKey={table.sortKey} direction={table.sortDirection} onSort={table.toggleSort} />
               <SortableTableHead label="Role" sortKey="role" activeSortKey={table.sortKey} direction={table.sortDirection} onSort={table.toggleSort} />
               <SortableTableHead label="โครงการที่รับผิดชอบ" sortKey="projects" activeSortKey={table.sortKey} direction={table.sortDirection} onSort={table.toggleSort} />
               <SortableTableHead label="สถานะ" sortKey="active" activeSortKey={table.sortKey} direction={table.sortDirection} onSort={table.toggleSort} />
+              <th className="p-3">จัดการ</th>
             </tr></thead>
-            <tbody>{table.pageItems.map((record) => <tr key={record.id} className="border-t border-slate-700/50"><td className="p-3"><div className="flex gap-2"><Button size="icon-sm" className="action-edit" title="แก้ไข" onClick={() => openEdit(record)}><Pencil /></Button><Button size="icon-sm" className="action-delete" title="ลบ" onClick={() => remove(record)}><Trash2 /></Button></div></td><td className="p-3 font-bold">{record.firstName} {record.lastName}</td><td className="p-3">{record.email}</td><td className="p-3">{record.role}</td><td className="p-3">{record.projects.map((item) => item.project.code).join(", ") || "-"}</td><td className="p-3">{record.active ? "ใช้งาน" : "ปิดใช้งาน"}</td></tr>)}</tbody>
+            <tbody>{table.pageItems.map((record) => <tr key={record.id} className="border-t border-slate-700/50"><td className="p-3 font-bold">{record.firstName} {record.lastName}</td><td className="p-3">{record.email}</td><td className="p-3">{record.role}</td><td className="p-3">{record.projects.map((item) => item.project.code).join(", ") || "-"}</td><td className="p-3">{record.active ? "ใช้งาน" : "ปิดใช้งาน"}</td><td className="p-3"><div className="flex gap-2"><Button size="icon-sm" className="action-edit" title="แก้ไข" onClick={() => openEdit(record)}><Pencil /></Button><Button size="icon-sm" className="action-delete" title="ลบ" onClick={() => remove(record)}><Trash2 /></Button></div></td></tr>)}</tbody>
           </table>
         </div>
         <DataTableControls

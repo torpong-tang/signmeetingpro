@@ -1,11 +1,13 @@
 import { redirect } from "next/navigation";
 import { LoginForm } from "@/components/auth/login-form";
 import { getCurrentUser } from "@/server/auth";
+import { PagePreferences } from "@/components/app/page-preferences";
 
 export default async function LoginPage() {
   if (await getCurrentUser()) redirect("/");
   return (
     <main className="grid min-h-screen place-items-center px-4 py-8">
+      <PagePreferences />
       <section className="grid w-full max-w-6xl items-center gap-10 lg:grid-cols-[1.2fr_.8fr]">
         <div className="hidden lg:block">
           <p className="mb-4 font-bold uppercase text-cyan-300">Meeting operations platform</p>

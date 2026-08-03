@@ -17,6 +17,10 @@ SignMeetingPro is a responsive meeting operations application for project-scoped
 - Attendance review is separated into QR Channel 2 and QR Channel 1. Each
   channel has an independent persisted display order, while PDF export always
   renders Channel 2 first, Channel 1 second and uses continuous row numbers.
+- Authorized administrators and project managers can edit attendance display
+  fields or delete a registration from the channel table. Meeting/channel,
+  registration number, PDF order, registration time and the captured signature
+  remain system-controlled; every mutation is audited.
 - Picture/document attachment service with type, size, total quota and SHA-256 validation.
 - Responsive desktop/tablet/mobile UI, Prompt font, consistent icon/color actions, confirmation dialogs and loading overlays.
 - Driver.js guided tour, health endpoint, unit tests and Playwright smoke tests.
@@ -71,5 +75,9 @@ plus one picture and one document per meeting, for continued manual inspection.
 Attendance PDF verification also covers the meeting organizer row rendered at
 the end of the table, channel-specific reordering and the continuous
 Channel 2-to-Channel 1 export sequence.
+
+Attendance edit/delete QA is intentionally non-destructive: Playwright opens
+the edit workflow, verifies the protected-field policy and confirms the delete
+warning, then cancels before removing persistent QA data.
 
 See [ARCHITECTURE.md](./ARCHITECTURE.md), [SECURITY.md](./SECURITY.md), and [DEPLOYMENT.md](./DEPLOYMENT.md).

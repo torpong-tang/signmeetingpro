@@ -16,6 +16,12 @@
 - Restrict SQLite and storage ownership to the PM2 service user.
 - Back up the database and storage directory as one consistency unit.
 - Run `npm audit --omit=dev`, lint, unit tests, build and Playwright before deployment.
+- Treat attendance as auditable evidence. Edit/delete APIs must authorize the
+  requested meeting project, reject system-controlled fields and write an
+  `AuditLog` record containing the previous and resulting values.
+- Attendance deletion must show an explicit irreversible warning. Signature
+  cleanup is restricted to the configured storage root and must never accept a
+  client-supplied filesystem path.
 
 ## Upload policy
 

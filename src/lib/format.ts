@@ -7,6 +7,17 @@ export function formatThaiDateTime(value?: string | Date | null) {
   }).format(new Date(value));
 }
 
+export function formatLocalizedBuddhistDateTime(value: string | Date, locale: "th" | "en") {
+  return new Intl.DateTimeFormat(
+    locale === "th" ? "th-TH-u-ca-buddhist-nu-latn" : "en-GB-u-ca-buddhist-nu-latn",
+    {
+      dateStyle: "medium",
+      timeStyle: "short",
+      timeZone: "Asia/Bangkok",
+    },
+  ).format(new Date(value));
+}
+
 export function formatThaiDate(value?: string | Date | null) {
   if (!value) return "-";
   return new Intl.DateTimeFormat("th-TH-u-ca-buddhist-nu-latn", {

@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { apiMutation } from "@/hooks/use-bootstrap";
 import { appPath } from "@/lib/app-path";
 import type { MeetingRecord } from "@/types/app";
+import type { AttendanceRecord } from "@/types/app";
 import type { AttendanceResponse } from "./attendance-dialog-types";
 import { orderedChannelAttendances } from "./attendance-dialog-utils";
 
@@ -11,6 +12,7 @@ export function useMeetingAttendance(meeting: MeetingRecord | null) {
   const [data, setData] = useState<AttendanceResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [reordering, setReordering] = useState(false);
+  const [mutating, setMutating] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -128,13 +130,65 @@ export function useMeetingAttendance(meeting: MeetingRecord | null) {
     }
   }
 
+  async function updateAttendance(
+    attendanceId: string,
+    values: {
+      firstName: string;
+      lastName: string;
+      position: string;
+      department: string;
+      phone: string;
+      email: string;
+    },
+  ) {
+    if (!meeting) return false;
+    setMutating(true);
+    setError("");
+    try {
+      const result = (await apiMutation(
+        `/api/meetings/${meeting.id}/attendance/${attendanceId}`,
+        "PUT",
+        values,
+      )) as AttendanceResponse;
+      setData(result);
+      return true;
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : "แก้ไขผู้ลงทะเบียนไม่สำเร็จ");
+      return false;
+    } finally {
+      setMutating(false);
+    }
+  }
+
+  async function deleteAttendance(attendance: AttendanceRecord) {
+    if (!meeting) return false;
+    setMutating(true);
+    setError("");
+    try {
+      const result = (await apiMutation(
+        `/api/meetings/${meeting.id}/attendance/${attendance.id}`,
+        "DELETE",
+      )) as AttendanceResponse;
+      setData(result);
+      return true;
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : "ลบผู้ลงทะเบียนไม่สำเร็จ");
+      return false;
+    } finally {
+      setMutating(false);
+    }
+  }
+
   return {
     data,
     loading,
     reordering,
+    mutating,
     error,
     channels,
     exportPortraitPdf,
     moveAttendance,
+    updateAttendance,
+    deleteAttendance,
   };
 }

@@ -6,17 +6,17 @@ async function login(page: import("@playwright/test").Page) {
   await page.goto("/login");
   await expect(page.locator("form")).toHaveAttribute("data-hydrated", "true");
   await page.getByLabel("E-mail *").fill(adminEmail);
-  await page.getByLabel("Password *").fill(adminPassword);
-  await page.getByRole("button", { name: "เข้าสู่ระบบ" }).click();
-  await expect(page.getByRole("heading", { name: "Dashboard" })).toBeVisible();
+  await page.getByLabel(/^(Password|รหัสผ่าน) \*$/).fill(adminPassword);
+  await page.getByRole("button", { name: /^(เข้าสู่ระบบ|Sign in)$/ }).click();
+  await expect(page.getByRole("heading", { name: /^(Dashboard|แดชบอร์ด)$/ })).toBeVisible();
 }
 
 test("persistent QA meetings expose QR names and attachment management", async ({ page }) => {
   await login(page);
-  await expect(page.locator("article").filter({ hasText: "Meetings" })).toBeVisible();
-  await expect(page.locator("article").filter({ hasText: "Attendance" })).toBeVisible();
+  await expect(page.locator("#tour-menu-home")).toBeVisible();
+  await expect(page.locator("#tour-menu-groups")).toBeVisible();
 
-  await page.getByRole("button", { name: "การประชุม Meeting workspace" }).click();
+  await page.locator("#tour-menu-home").click();
   await expect(page).toHaveURL(/\/meetings$/);
   const meetingsPage = page;
   await expect(meetingsPage.getByRole("heading", { name: "รายการการประชุม" })).toBeVisible();
@@ -54,7 +54,7 @@ test("persistent QA meetings expose QR names and attachment management", async (
   const editDialog = page.getByRole("dialog", { name: /แก้ไข MTG-/ });
   await expect(editDialog.getByText("รูปประกอบ QR Code ตาม Channel", { exact: true })).toBeVisible();
   await expect(editDialog.getByRole("button", { name: "เลือกรูป" })).toHaveCount(2);
-  await editDialog.getByRole("button", { name: "ปิด", exact: true }).click();
+  await editDialog.getByRole("button", { name: "ปิด", exact: true }).last().click();
 
   await firstMeetingRecord
     .getByRole("button", { name: "สร้างการประชุมซ้ำ" })
@@ -66,7 +66,10 @@ test("persistent QA meetings expose QR names and attachment management", async (
   await expect(
     copyDialog.getByText("ล็อกตามโครงการของการประชุมต้นฉบับ"),
   ).toBeVisible();
-  await copyDialog.getByRole("button", { name: "ปิด", exact: true }).click();
+  await copyDialog
+    .getByRole("button", { name: "ปิด", exact: true })
+    .last()
+    .click();
 
   await firstMeetingRecord
     .getByRole("button", { name: /^เปิดผู้ลงทะเบียน \d+ คน$/ })
@@ -108,7 +111,10 @@ test("persistent QA meetings expose QR names and attachment management", async (
   const downloadedPath = await download.path();
   expect(downloadedPath).toBeTruthy();
   expect((await readFile(downloadedPath!)).subarray(0, 4).toString()).toBe("%PDF");
-  await attendanceDialog.getByRole("button", { name: "ปิด", exact: true }).click();
+  await attendanceDialog
+    .getByRole("button", { name: "ปิด", exact: true })
+    .last()
+    .click();
 
   await firstMeetingRecord.getByRole("button", { name: "จัดการไฟล์ประกอบ" }).click();
   const mediaDialog = page.getByRole("dialog", { name: /ไฟล์ประกอบ/ });
@@ -125,15 +131,49 @@ test("persistent QA meetings expose QR names and attachment management", async (
     )
     .toBeGreaterThan(0);
   await expect(mediaDialog.getByText("qa-meeting-1.pdf", { exact: true })).toBeVisible();
-  await mediaDialog.getByRole("button", { name: "ปิด", exact: true }).click();
+  await mediaDialog
+    .getByRole("button", { name: "ปิด", exact: true })
+    .last()
+    .click();
   await page.getByRole("button", { name: "กลับ Dashboard" }).click();
-  await page.getByRole("button", { name: "กลุ่มผู้เข้าร่วม Groups & people" }).click();
+  await page.locator("#tour-menu-groups").click();
   const groupsDialog = page.getByRole("dialog", { name: "กลุ่มและผู้เข้าร่วมประชุม" });
   for (const groupName of ["QA Operations Team", "QA Partner Team", "QA Guest Team"]) {
     const groupCard = groupsDialog.locator("article").filter({ hasText: groupName });
     await expect(groupCard).toHaveCount(1);
     await expect(groupCard.getByText("5 รายชื่อ", { exact: true })).toBeVisible();
   }
+});
+
+test("attendance actions stay at the end and expose guarded edit and delete flows", async ({ page }) => {
+  await login(page);
+  await page.goto("/meetings");
+  await expect(page).toHaveURL(/\/meetings$/);
+
+  await page.getByRole("button", { name: /^เปิดผู้ลงทะเบียน [1-9]\d* คน$/ }).first().click();
+  const attendanceDialog = page.getByRole("dialog", { name: /ผู้ลงทะเบียน MTG-/ });
+  await expect(attendanceDialog).toBeVisible();
+
+  const populatedTable = attendanceDialog
+    .locator("table:has(button[aria-label^='แก้ไข '])")
+    .first();
+  await expect(populatedTable).toBeVisible();
+  const headers = await populatedTable.locator("thead th").allTextContents();
+  expect(headers.at(-1)?.trim()).toBe("จัดการ");
+
+  await attendanceDialog.getByRole("button", { name: /^แก้ไข / }).first().click();
+  const editDialog = page.getByRole("dialog", { name: "แก้ไขผู้ลงทะเบียน" });
+  await expect(editDialog).toBeVisible();
+  await expect(editDialog.getByLabel("ชื่อ *")).toBeVisible();
+  await expect(editDialog.getByLabel("นามสกุล *")).toBeVisible();
+  await expect(editDialog.getByLabel("ตำแหน่ง *")).toBeVisible();
+  await expect(editDialog.getByText(/QR Channel .*ลำดับลงทะเบียน/)).toBeVisible();
+  await editDialog.getByRole("button", { name: "ปิด", exact: true }).last().click();
+
+  await attendanceDialog.getByRole("button", { name: /^ลบ / }).first().click();
+  const confirmDialog = page.getByRole("alertdialog", { name: "ยืนยันการลบผู้ลงทะเบียน" });
+  await expect(confirmDialog).toContainText("รายการและลายเซ็นจะถูกลบถาวร");
+  await confirmDialog.getByRole("button", { name: "ยกเลิก" }).click();
 });
 
 test("QR channel images upload securely and remain available through the QR token", async ({ page }) => {
@@ -220,7 +260,10 @@ test("switching QR channel mode clears stale group and organization values", asy
   await expect(groupOrganization).toHaveValue("");
   await expect(groupOrganization).toBeDisabled();
 
-  await createDialog.getByRole("button", { name: "ปิด", exact: true }).click();
+  await createDialog
+    .getByRole("button", { name: "ปิด", exact: true })
+    .last()
+    .click();
 });
 
 test("mixed GROUP and OPEN QA meetings retain 25 attendance records and export PDF", async ({ page }, testInfo) => {

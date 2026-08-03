@@ -73,6 +73,7 @@ export function MeetingWorkspace({
       />
       <MeetingAttendanceDialog
         meeting={workspace.attendanceMeeting}
+        onChanged={onChanged}
         onOpenChange={(open) =>
           !open && workspace.setAttendanceMeeting(null)
         }

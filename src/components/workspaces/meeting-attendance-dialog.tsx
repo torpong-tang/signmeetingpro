@@ -1,22 +1,77 @@
 "use client";
 
+import { useState } from "react";
 import { Download, LoaderCircle, UsersRound } from "lucide-react";
 import { AdaptiveDialog } from "@/components/shared/adaptive-dialog";
+import { ConfirmActionDialog, type ConfirmAction } from "@/components/shared/confirm-action-dialog";
 import { LoadingOverlay } from "@/components/shared/loading-overlay";
 import { Button } from "@/components/ui/button";
-import type { MeetingRecord } from "@/types/app";
+import type { AttendanceRecord, MeetingRecord } from "@/types/app";
+import { AttendanceEditDialog, type AttendanceEditValues } from "./attendance-edit-dialog";
 import { AttendanceChannelSection } from "./attendance-channel-section";
+import type { AttendanceChannel } from "./attendance-dialog-types";
 import { orderedChannelAttendances } from "./attendance-dialog-utils";
 import { useMeetingAttendance } from "./use-meeting-attendance";
 
 export function MeetingAttendanceDialog({
   meeting,
   onOpenChange,
+  onChanged,
 }: {
   meeting: MeetingRecord | null;
   onOpenChange: (open: boolean) => void;
+  onChanged?: () => Promise<void>;
 }) {
   const attendance = useMeetingAttendance(meeting);
+  const [editing, setEditing] = useState<AttendanceRecord | null>(null);
+  const [editingChannel, setEditingChannel] = useState<AttendanceChannel | null>(null);
+  const [confirm, setConfirm] = useState<ConfirmAction>({ open: false, title: "", description: "" });
+  const [pending, setPending] = useState<null | (() => Promise<void>)>(null);
+
+  function ask(state: ConfirmAction, action: () => Promise<void>) {
+    setPending(() => action);
+    setConfirm(state);
+  }
+
+  async function runPending() {
+    setConfirm((current) => ({ ...current, open: false }));
+    await pending?.();
+  }
+
+  function openEdit(record: AttendanceRecord, channel: AttendanceChannel) {
+    setEditing(record);
+    setEditingChannel(channel);
+  }
+
+  function requestUpdate(values: AttendanceEditValues) {
+    if (!editing) return;
+    ask({
+      open: true,
+      title: "ยืนยันการแก้ไขผู้ลงทะเบียน",
+      description: `${values.firstName} ${values.lastName} · ข้อมูลการลงทะเบียนลำดับ ${editing.personNo}`,
+      kind: "save",
+      confirmLabel: "บันทึกการแก้ไข",
+    }, async () => {
+      const updated = await attendance.updateAttendance(editing.id, values);
+      if (updated) {
+        setEditing(null);
+        setEditingChannel(null);
+      }
+    });
+  }
+
+  function requestDelete(record: AttendanceRecord) {
+    ask({
+      open: true,
+      title: "ยืนยันการลบผู้ลงทะเบียน",
+      description: `ลำดับ ${record.personNo} · ${record.firstNameSnapshot} ${record.lastNameSnapshot} รายการและลายเซ็นจะถูกลบถาวร`,
+      kind: "delete",
+      confirmLabel: "ลบผู้ลงทะเบียน",
+    }, async () => {
+      const deleted = await attendance.deleteAttendance(record);
+      if (deleted) await onChanged?.();
+    });
+  }
 
   return (
     <AdaptiveDialog
@@ -33,7 +88,7 @@ export function MeetingAttendanceDialog({
         <Button
           type="button"
           className="action-document"
-          disabled={attendance.loading || attendance.reordering}
+          disabled={attendance.loading || attendance.reordering || attendance.mutating}
           onClick={attendance.exportPortraitPdf}
         >
           <Download />
@@ -43,6 +98,9 @@ export function MeetingAttendanceDialog({
     >
       {attendance.reordering && (
         <LoadingOverlay label="กำลังบันทึกลำดับรายชื่อสำหรับ PDF..." />
+      )}
+      {attendance.mutating && (
+        <LoadingOverlay label="กำลังบันทึกข้อมูลผู้ลงทะเบียน..." />
       )}
 
       {attendance.loading && (
@@ -81,7 +139,7 @@ export function MeetingAttendanceDialog({
                   attendance.data!.attendances,
                   channel.id,
                 )}
-                disabled={attendance.reordering}
+                disabled={attendance.reordering || attendance.mutating}
                 onMove={(attendanceId, direction) =>
                   attendance.moveAttendance(
                     channel.id,
@@ -89,11 +147,31 @@ export function MeetingAttendanceDialog({
                     direction,
                   )
                 }
+                onEdit={openEdit}
+                onDelete={requestDelete}
               />
             ))}
           </div>
         </>
       )}
+
+      <AttendanceEditDialog
+        attendance={editing}
+        channel={editingChannel}
+        disabled={attendance.mutating}
+        onOpenChange={(open) => {
+          if (!open) {
+            setEditing(null);
+            setEditingChannel(null);
+          }
+        }}
+        onSubmit={requestUpdate}
+      />
+      <ConfirmActionDialog
+        state={confirm}
+        onOpenChange={(open) => setConfirm((current) => ({ ...current, open }))}
+        onConfirm={runPending}
+      />
     </AdaptiveDialog>
   );
 }

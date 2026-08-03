@@ -1,7 +1,8 @@
 import assert from "node:assert/strict";
-import test from "node:test";
+import { test } from "vitest";
 import {
   formatBuddhistDateInput,
+  formatLocalizedBuddhistDateTime,
   formatThaiDate,
   formatThaiDateTime,
   getBuddhistYear,
@@ -27,4 +28,15 @@ test("application date and date-time formatters use Buddhist Era", () => {
 
 test("meeting year is calculated in Buddhist Era using Bangkok time", () => {
   assert.equal(getBuddhistYear(new Date("2026-07-27T00:00:00.000Z")), 2569);
+});
+
+test("localized dashboard dates keep Buddhist Era while changing language", () => {
+  const value = "2026-07-27T03:30:00.000Z";
+  const thai = formatLocalizedBuddhistDateTime(value, "th");
+  const english = formatLocalizedBuddhistDateTime(value, "en");
+
+  assert.match(thai, /2569/);
+  assert.match(english, /2569/);
+  assert.match(english, /Jul/i);
+  assert.doesNotMatch(english, /ก\.ค\./);
 });

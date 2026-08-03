@@ -37,15 +37,24 @@ Large feature screens use a consistent controller/view split:
   state, while `registration-fields.tsx`, `registration-meeting-summary.tsx`
   and `registration-dialogs.tsx` own focused presentation.
 - `meeting-workspace.tsx` is a composition root only.
-  `use-meeting-workspace.ts` owns URL filters, create/edit/copy/delete flows,
-  QR image upload and confirmation state. `meeting-list-section.tsx` and
-  `meeting-form-dialog.tsx` render the responsive list and editor.
+  `use-meeting-workspace.ts` coordinates create/edit/copy/delete and QR image
+  mutations. URL filter synchronization, form/deep-link state and reusable
+  confirmation state live in `use-meeting-filters.ts`,
+  `use-meeting-form-state.ts` and `use-confirmed-action.ts` respectively.
+  `meeting-list-section.tsx` owns filtering/pagination composition, while
+  `meeting-list-views.tsx` renders desktop/mobile records and action controls.
+  `meeting-form-dialog.tsx` renders the editor.
+- `meeting-media-dialog.tsx` owns media API state and confirmation flow.
+  `meeting-media-section.tsx` owns upload controls, image thumbnails and file
+  actions for each media kind, keeping presentation separate from mutations.
 - `meeting-form-model.ts` contains empty-form defaults and the
   database-record-to-form mapper. These conversions do not belong in a view.
 - `meeting-attendance-dialog.tsx` composes the attendance modal.
   `use-meeting-attendance.ts` owns fetch/export/reorder state and
   `attendance-channel-section.tsx` owns each independently sortable and
-  pageable channel table.
+  pageable channel table. `attendance-edit-dialog.tsx` contains only editable
+  attendance fields, while `attendance-edit-policy.ts` normalizes and validates
+  the same contract before the service accepts a mutation.
 - Shared ordering rules live in `attendance-dialog-utils.ts`; UI components do
   not duplicate fallback-order calculations.
 
@@ -79,6 +88,14 @@ provided by the attendance service.
 - Admin can access all projects. Meeting managers access assigned projects.
 - Passwords are bcrypt hashes with cost 12.
 - Attendance stores snapshots so later master-data edits do not rewrite historical evidence.
+- Attendance edit/delete requires project access. Editable snapshots are name,
+  position, organization, phone and email only. Meeting/channel IDs, participant
+  ID, person number, PDF order, registration time and signature are immutable.
+- GROUP registrations always derive organization from the QR Channel alias;
+  OPEN registrations require an explicitly supplied organization.
+- Attendance deletion is transactional, normalizes the remaining channel PDF
+  order, records an audit event and removes the signature only from the bounded
+  application storage root.
 - Meeting fields become immutable after attendance exists; only registration policy/status can change.
 - Meetings with attendance are archived instead of physically deleted.
 
@@ -95,6 +112,8 @@ provided by the attendance service.
 - Reordering must submit every attendance ID in one channel exactly once. The
   service verifies project access and channel ownership, updates the order in
   one transaction and writes an audit record.
+- Attendance update/delete services verify that the attendance belongs to the
+  requested meeting before applying the project authorization policy.
 - Files are named with UUIDs; the original name is metadata only.
 - File checksum and size are recorded.
 

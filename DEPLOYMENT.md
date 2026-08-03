@@ -103,6 +103,12 @@ Open one meeting containing registrations from both channels and verify that:
 - Up/down controls persist independently inside each channel after refresh.
 - PDF export starts with the reordered Channel 2 rows, continues with the
   reordered Channel 1 rows and numbers all rows continuously.
+- The final attendance column is `Actions`; edit opens only permitted snapshot
+  fields and GROUP organization remains locked to the QR Channel alias.
+- Delete displays the meeting registration identity and irreversible signature
+  warning. Cancel the production smoke test without deleting real evidence.
+- Verify with both an administrator and an assigned meeting manager that an
+  unassigned project cannot call the attendance update/delete API.
 
 ## Backup and restore drill
 

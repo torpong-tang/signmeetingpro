@@ -34,26 +34,26 @@ export function GroupParticipantTable({
         <table className="w-full min-w-[700px] text-sm">
           <thead className="text-left text-slate-400">
             <tr>
-              <th className="pb-2">จัดการ</th>
               <SortableTableHead className="p-0 pb-2" label="ชื่อ-นามสกุล" sortKey="name" activeSortKey={table.sortKey} direction={table.sortDirection} onSort={table.toggleSort} />
               <SortableTableHead className="p-0 pb-2" label="ตำแหน่ง" sortKey="position" activeSortKey={table.sortKey} direction={table.sortDirection} onSort={table.toggleSort} />
               <SortableTableHead className="p-0 pb-2" label="หน่วยงาน" sortKey="department" activeSortKey={table.sortKey} direction={table.sortDirection} onSort={table.toggleSort} />
               <SortableTableHead className="p-0 pb-2" label="ติดต่อ" sortKey="contact" activeSortKey={table.sortKey} direction={table.sortDirection} onSort={table.toggleSort} />
+              <th className="pb-2">จัดการ</th>
             </tr>
           </thead>
           <tbody>
             {table.pageItems.map((person) => (
               <tr key={person.id} className="border-t border-slate-700/50">
+                <td className="py-2 font-bold">{person.firstName} {person.lastName}</td>
+                <td>{person.position}</td>
+                <td>{group.name}</td>
+                <td>{person.email || person.phone || "-"}</td>
                 <td className="py-2">
                   <div className="flex gap-2">
                     <Button size="icon-sm" className="action-edit" title="แก้ไข" onClick={() => onEdit(group, person)}><Pencil /></Button>
                     <Button size="icon-sm" className="action-delete" title="ลบ" onClick={() => onDelete(group, person)}><Trash2 /></Button>
                   </div>
                 </td>
-                <td className="py-2 font-bold">{person.firstName} {person.lastName}</td>
-                <td>{person.position}</td>
-                <td>{group.name}</td>
-                <td>{person.email || person.phone || "-"}</td>
               </tr>
             ))}
             {table.totalItems === 0 && (

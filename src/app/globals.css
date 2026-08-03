@@ -87,6 +87,7 @@
     min-height: 100%;
     font-family: var(--font-prompt), sans-serif;
     background: #050d1d;
+    font-size: 16px;
   }
   body {
     min-height: 100vh;
@@ -133,6 +134,34 @@
       drop-shadow(0 0 5px var(--button-glow, rgba(255, 183, 3, 0.5)))
       drop-shadow(0 0 14px var(--button-glow, rgba(34, 211, 238, 0.3)));
   }
+}
+
+html[data-font-size="small"] { font-size: 14px; }
+html[data-font-size="default"] { font-size: 16px; }
+html[data-font-size="large"] { font-size: 18px; }
+
+html[data-contrast="high"] {
+  --background: #000000;
+  --foreground: #ffffff;
+  --card: #071426;
+  --card-foreground: #ffffff;
+  --popover: #030b17;
+  --popover-foreground: #ffffff;
+  --muted-foreground: #dbeafe;
+  --border: rgba(255, 255, 255, 0.72);
+  --input: #071426;
+  --ring: #facc15;
+}
+
+html[data-contrast="high"] body {
+  background: #000000;
+}
+
+html[data-contrast="high"] .glass-panel,
+html[data-contrast="high"] .glass-card {
+  background: #071426;
+  border-color: rgba(255, 255, 255, 0.72);
+  backdrop-filter: none;
 }
 
 @layer components {
@@ -263,6 +292,25 @@
   }
   .action-switch:hover {
     background-color: #2dd4bf !important;
+  }
+  .preference-contrast-button {
+    border-color: rgba(148, 163, 184, 0.62) !important;
+    background: rgba(2, 6, 23, 0.68) !important;
+    color: #f8fafc !important;
+  }
+  .preference-contrast-button:hover {
+    border-color: rgba(103, 232, 249, 0.8) !important;
+    background: rgba(14, 116, 144, 0.38) !important;
+    color: #ffffff !important;
+  }
+  .preference-contrast-button.is-active {
+    border-color: #fde047 !important;
+    background: #facc15 !important;
+    color: #0f172a !important;
+  }
+  .preference-contrast-button.is-active:hover {
+    background: #fde047 !important;
+    color: #020617 !important;
   }
   .required-mark {
     @apply ml-1 text-rose-400;

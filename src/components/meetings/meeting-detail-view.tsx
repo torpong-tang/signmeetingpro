@@ -127,6 +127,9 @@ export function MeetingDetailView({ meeting }: { meeting: MeetingRecord }) {
       <MeetingAttendanceDialog
         meeting={attendanceOpen ? meeting : null}
         onOpenChange={(open) => setAttendanceOpen(open)}
+        onChanged={async () => {
+          router.refresh();
+        }}
       />
       <MeetingMediaDialog
         meeting={mediaOpen ? meeting : null}

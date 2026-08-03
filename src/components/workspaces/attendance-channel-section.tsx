@@ -1,14 +1,15 @@
 "use client";
 
 import { useMemo } from "react";
-import { ArrowDown, ArrowUp, QrCode } from "lucide-react";
+import { ArrowDown, ArrowUp, Pencil, QrCode, Trash2 } from "lucide-react";
+import { useUiPreferences } from "@/components/app/ui-preferences-provider";
 import {
   DataTableControls,
   SortableTableHead,
 } from "@/components/shared/data-table-controls";
 import { Button } from "@/components/ui/button";
 import { useDataTable } from "@/hooks/use-data-table";
-import { formatThaiDateTime } from "@/lib/format";
+import { formatLocalizedBuddhistDateTime } from "@/lib/format";
 import type { AttendanceRecord } from "@/types/app";
 import type {
   AttendanceChannel,
@@ -21,12 +22,17 @@ export function AttendanceChannelSection({
   attendances,
   disabled,
   onMove,
+  onEdit,
+  onDelete,
 }: {
   channel: AttendanceChannel;
   attendances: AttendanceRecord[];
   disabled: boolean;
   onMove: (attendanceId: string, direction: -1 | 1) => void;
+  onEdit: (attendance: AttendanceRecord, channel: AttendanceChannel) => void;
+  onDelete: (attendance: AttendanceRecord) => void;
 }) {
+  const { locale } = useUiPreferences();
   const table = useDataTable<AttendanceRecord, AttendanceSortKey>({
     items: attendances,
     initialSortKey: "order",
@@ -84,7 +90,7 @@ export function AttendanceChannelSection({
       </div>
 
       <div className="overflow-x-auto rounded-lg border border-slate-600/40">
-        <table className="w-full min-w-[940px] text-sm">
+        <table className="w-full min-w-[1040px] text-sm">
           <thead className="bg-[#071426] text-left text-slate-300">
             <tr>
               <th scope="col" className="p-3 text-center">
@@ -126,6 +132,7 @@ export function AttendanceChannelSection({
                 direction={table.sortDirection}
                 onSort={table.toggleSort}
               />
+              <th scope="col" className="p-3 text-center">จัดการ</th>
             </tr>
           </thead>
           <tbody>
@@ -183,7 +190,33 @@ export function AttendanceChannelSection({
                     {attendance.channel.aliasName}
                   </td>
                   <td className="p-3">
-                    {formatThaiDateTime(attendance.registeredAt)}
+                    {formatLocalizedBuddhistDateTime(attendance.registeredAt, locale)}
+                  </td>
+                  <td className="p-3">
+                    <div className="flex justify-center gap-2">
+                      <Button
+                        type="button"
+                        size="icon-sm"
+                        className="action-edit"
+                        title="แก้ไขผู้ลงทะเบียน"
+                        aria-label={`แก้ไข ${attendance.firstNameSnapshot} ${attendance.lastNameSnapshot}`}
+                        disabled={disabled}
+                        onClick={() => onEdit(attendance, channel)}
+                      >
+                        <Pencil />
+                      </Button>
+                      <Button
+                        type="button"
+                        size="icon-sm"
+                        className="action-delete"
+                        title="ลบผู้ลงทะเบียน"
+                        aria-label={`ลบ ${attendance.firstNameSnapshot} ${attendance.lastNameSnapshot}`}
+                        disabled={disabled}
+                        onClick={() => onDelete(attendance)}
+                      >
+                        <Trash2 />
+                      </Button>
+                    </div>
                   </td>
                 </tr>
               );
@@ -191,7 +224,7 @@ export function AttendanceChannelSection({
             {attendances.length === 0 && (
               <tr>
                 <td
-                  colSpan={6}
+                  colSpan={7}
                   className="p-8 text-center text-slate-400"
                 >
                   ยังไม่มีผู้ลงทะเบียนผ่าน QR Channel{" "}

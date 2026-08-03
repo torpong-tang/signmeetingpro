@@ -153,22 +153,22 @@ export function ProjectWorkspace({
         <div className="hidden overflow-hidden rounded-lg border border-slate-600/40 md:block">
           <table className="w-full text-sm">
             <thead className="bg-[#071426] text-left text-slate-300"><tr>
-              <th className="p-3">จัดการ</th>
               <SortableTableHead label="รหัส" sortKey="code" activeSortKey={table.sortKey} direction={table.sortDirection} onSort={table.toggleSort} />
               <SortableTableHead label="โครงการ" sortKey="name" activeSortKey={table.sortKey} direction={table.sortDirection} onSort={table.toggleSort} />
               <SortableTableHead label="สัญญา" sortKey="contractNumber" activeSortKey={table.sortKey} direction={table.sortDirection} onSort={table.toggleSort} />
               <SortableTableHead label="ระยะเวลา" sortKey="contractStart" activeSortKey={table.sortKey} direction={table.sortDirection} onSort={table.toggleSort} />
-              <SortableTableHead label="การใช้งาน" sortKey="active" activeSortKey={table.sortKey} direction={table.sortDirection} onSort={table.toggleSort} />
+              <SortableTableHead label="สถานะ" sortKey="active" activeSortKey={table.sortKey} direction={table.sortDirection} onSort={table.toggleSort} />
+              <th className="p-3">จัดการ</th>
             </tr></thead>
             <tbody>
               {table.pageItems.map((record) => (
                 <tr key={record.id} className="border-t border-slate-700/50">
-                  <td className="p-3"><div className="flex gap-2"><Button size="icon-sm" className="action-edit" title="แก้ไข" onClick={() => openEdit(record)}><Pencil /></Button><Button size="icon-sm" className="action-delete" title="ลบ" onClick={() => requestDelete(record)}><Trash2 /></Button></div></td>
                   <td className="p-3 font-bold text-cyan-300">{record.code}</td>
                   <td className="p-3">{record.name}</td>
                   <td className="p-3">{record.contractNumber || "-"}</td>
                   <td className="p-3">{formatThaiDate(record.contractStart)} - {formatThaiDate(record.contractEnd)}</td>
                   <td className="p-3">{record.active ? "ใช้งาน" : "ปิดใช้งาน"}</td>
+                  <td className="p-3"><div className="flex gap-2"><Button size="icon-sm" className="action-edit" title="แก้ไข" onClick={() => openEdit(record)}><Pencil /></Button><Button size="icon-sm" className="action-delete" title="ลบ" onClick={() => requestDelete(record)}><Trash2 /></Button></div></td>
                 </tr>
               ))}
             </tbody>
@@ -222,7 +222,7 @@ export function ProjectWorkspace({
               ariaLabel="เลือกวันสิ้นสุดสัญญา"
             />
           </div>
-          <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={form.active} onChange={(event) => setForm({ ...form, active: event.target.checked })} /> เปิดใช้งาน</label>
+          <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={form.active} onChange={(event) => setForm({ ...form, active: event.target.checked })} /> ใช้งาน</label>
           {error && <p className="text-sm text-rose-300 sm:col-span-2">{error}</p>}
         </form>
       </AdaptiveDialog>

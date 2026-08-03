@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { UiPreferencesProvider } from "@/components/app/ui-preferences-provider";
 import "./globals.css";
 
 const prompt = localFont({
@@ -21,7 +22,9 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="th" className={`${prompt.variable} dark`}>
       <body suppressHydrationWarning>
-        <TooltipProvider>{children}</TooltipProvider>
+        <UiPreferencesProvider>
+          <TooltipProvider>{children}</TooltipProvider>
+        </UiPreferencesProvider>
       </body>
     </html>
   );

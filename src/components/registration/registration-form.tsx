@@ -14,6 +14,7 @@ import { SignaturePad } from "@/components/registration/signature-pad";
 import { useRegistrationForm } from "@/components/registration/use-registration-form";
 import { LoadingOverlay } from "@/components/shared/loading-overlay";
 import { Button } from "@/components/ui/button";
+import { PagePreferences } from "@/components/app/page-preferences";
 
 export function RegistrationForm({ token }: { token: string }) {
   const registration = useRegistrationForm(token);
@@ -44,6 +45,7 @@ export function RegistrationForm({ token }: { token: string }) {
 
   return (
     <>
+      <PagePreferences />
       {registration.submitting && (
         <LoadingOverlay label="กำลังบันทึกการลงทะเบียน..." />
       )}

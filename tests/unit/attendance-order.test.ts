@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import test from "node:test";
+import { test } from "vitest";
 import { sortAttendanceByChannelAndOrder } from "../../src/lib/attendance-order";
 
 test("attendance PDF puts QR Channel 2 first and respects channel order", () => {

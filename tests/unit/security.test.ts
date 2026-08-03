@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import test from "node:test";
+import { test } from "vitest";
 import { createOpaqueToken, hashToken, safeJson } from "../../src/lib/security";
 
 test("opaque session tokens are unique and hash deterministically", () => {
