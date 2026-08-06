@@ -14,6 +14,15 @@ test("UI preferences restore supported values", () => {
   );
 });
 
+test("UI preferences support all five text-size levels", () => {
+  for (const fontSize of ["xsmall", "small", "default", "large", "xlarge"] as const) {
+    assert.equal(
+      parseUiPreferences(JSON.stringify({ locale: "th", fontSize, highContrast: false })).fontSize,
+      fontSize,
+    );
+  }
+});
+
 test("UI preferences reject unsupported stored values", () => {
   assert.deepEqual(
     parseUiPreferences(JSON.stringify({ locale: "de", fontSize: "huge", highContrast: "yes" })),

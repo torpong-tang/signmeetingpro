@@ -4,14 +4,16 @@ import { Accessibility, Contrast, Languages } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { useUiPreferences } from "@/components/app/ui-preferences-provider";
+import { useUiPreferences, type MessageKey } from "@/components/app/ui-preferences-provider";
 import type { FontSizePreference } from "@/lib/ui-preferences";
 import { cn } from "@/lib/utils";
 
-const fontOptions: Array<{ value: FontSizePreference; label: string; message: "fontSmaller" | "fontDefault" | "fontLarger" }> = [
+const fontOptions: Array<{ value: FontSizePreference; label: string; message: MessageKey }> = [
+  { value: "xsmall", label: "A--", message: "fontExtraSmall" },
   { value: "small", label: "A-", message: "fontSmaller" },
   { value: "default", label: "A", message: "fontDefault" },
   { value: "large", label: "A+", message: "fontLarger" },
+  { value: "xlarge", label: "A++", message: "fontExtraLarge" },
 ];
 
 function PreferenceControls({ compact = false }: { compact?: boolean }) {
@@ -29,11 +31,12 @@ function PreferenceControls({ compact = false }: { compact?: boolean }) {
                   <Button
                     type="button"
                     variant="outline"
-                    size="icon-lg"
+                    size="icon"
                     className={cn(
-                      "border-slate-500/50 bg-slate-950/35 font-bold text-white",
+                      "h-9 min-w-9 border-slate-500/50 bg-slate-950/35 px-1.5 text-xs font-bold text-white",
                       fontSize === option.value && "border-cyan-300 bg-cyan-400/20 text-cyan-100 ring-2 ring-cyan-300/45",
                     )}
+                    aria-label={t(option.message)}
                     aria-pressed={fontSize === option.value}
                     onClick={() => setFontSize(option.value)}
                   />

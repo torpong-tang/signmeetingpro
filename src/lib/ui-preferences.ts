@@ -1,6 +1,6 @@
 export const UI_PREFERENCES_STORAGE_KEY = "signmeetingpro.ui-preferences.v1";
 
-export const FONT_SIZES = ["small", "default", "large"] as const;
+export const FONT_SIZES = ["xsmall", "small", "default", "large", "xlarge"] as const;
 export type FontSizePreference = (typeof FONT_SIZES)[number];
 export type AppLocale = "th" | "en";
 

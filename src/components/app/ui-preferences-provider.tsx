@@ -15,9 +15,11 @@ const messages = {
   th: {
     accessibility: "การช่วยการเข้าถึง",
     fontSize: "ขนาดตัวอักษร",
+    fontExtraSmall: "ตัวอักษรเล็กมาก",
     fontSmaller: "ลดขนาดตัวอักษร",
     fontDefault: "ขนาดตัวอักษรปกติ",
     fontLarger: "เพิ่มขนาดตัวอักษร",
+    fontExtraLarge: "ตัวอักษรใหญ่มาก",
     contrast: "ปรับสี",
     contrastOn: "เปิดโหมดสีตัดกันสูง",
     contrastOff: "กลับสู่โหมดสีปกติ",
@@ -87,9 +89,11 @@ const messages = {
   en: {
     accessibility: "Accessibility",
     fontSize: "Text size",
+    fontExtraSmall: "Extra small text",
     fontSmaller: "Decrease text size",
     fontDefault: "Default text size",
     fontLarger: "Increase text size",
+    fontExtraLarge: "Extra large text",
     contrast: "Contrast",
     contrastOn: "Enable high contrast",
     contrastOff: "Use normal contrast",
